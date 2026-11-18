@@ -5,7 +5,8 @@ from agents.poker_agents import (
     random_agent,
     improved_random_agent,
     rule_based_agent,
-    improved_rule_based_agent
+    improved_rule_based_agent,
+    trained_linear_agent
 )
 
 from environments.rlcard_env import create_environment
@@ -90,8 +91,8 @@ def display_reduced_state(state, player_id, decision):
 
 
 def main():
-    player1 = improved_rule_based_agent
-    player2 = improved_random_agent
+    player1 = trained_linear_agent
+    player2 = improved_rule_based_agent
     env = create_environment()
     player1profit = 0 
 
@@ -124,7 +125,7 @@ def main():
         print("Final payoffs:", env.get_payoffs())
         player1profit += env.get_payoffs()[0]
         print("Total profit (BB):", player1profit)
-        print("Average BB/100:", player1profit / 10000 * 100)
+        print("Average big blinds won per 100 hands:", player1profit / 10000 * 100)
 
 
 if __name__ == "__main__":
