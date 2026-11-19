@@ -1,6 +1,12 @@
 
 import random
 import numpy as np
+from agents.poker_agents import (
+    random_agent,
+    improved_random_agent,
+    rule_based_agent,
+    improved_rule_based_agent
+)
 
 from environments.rlcard_env import create_environment
 
@@ -44,14 +50,34 @@ ACTION_NAMES = {
 
 #     return legal_actions
 
+def format_card(card):
+    suits = {
+        "S": "♠",
+        "H": "♥",
+        "D": "♦",
+        "C": "♣"
+    }
+
+    rank = card[1:]
+    if rank == "T":
+        rank = "10"
+
+    return rank + suits[card[0]]
+
+
+def format_hand(cards):
+    return " ".join(
+        f"[{format_card(card)}]" for card in cards
+    )
+
 def display_reduced_state(state, player_id, decision):
     raw = state["raw_obs"]
     legal_actions = list(state["legal_actions"].keys())
     print(" ")
     print("its player: " +  str(player_id + 1) + "s turn descision " + str(decision))
     print(" ")
-    print("Hole cards:", raw["hand"])
-    print("Community cards:", raw["public_cards"])
+    print("Hole cards:", format_hand(raw["hand"]))
+    print("Community cards:", format_hand(raw["public_cards"]))
     print("Chips committed:", raw["all_chips"])
     print("Pot size:", sum(raw["all_chips"]))
     print("Raises per round:", raw["raise_nums"])
@@ -64,13 +90,14 @@ def display_reduced_state(state, player_id, decision):
 
 
 def main():
+    player1 = improved_rule_based_agent
+    player2 = improved_random_agent
     env = create_environment()
     player1profit = 0 
 
-    for episode in range(10):
+    for episode in range(10000):
         state, player_id = env.reset()
-
-        # Play 10 full hands
+        state = env.get_state(player_id)
         decision = 1
 
         while not env.is_over():
@@ -80,13 +107,16 @@ def main():
             )
 
             # Temporary random policy
-            action = random.choice(legal_actions)
+            if ( player_id == 0 ):
+                action = player1(state)
+            else:
+                action = player2(state)
 
             print("\n--- SELECTED ACTION ---")
-            print(f"Player {player_id}: {ACTION_NAMES[action]}")
+            print(f"Player {player_id + 1}: {action}")
 
             # Apply the action and obtain the next state
-            state, player_id = env.step(action)
+            state, player_id = env.step(action, raw_action = True)
             decision += 1
 
         print(f"\n{'=' * 50}")
@@ -94,7 +124,11 @@ def main():
         print("Final payoffs:", env.get_payoffs())
         player1profit += env.get_payoffs()[0]
         print("Total profit (BB):", player1profit)
+        print("Average BB/100:", player1profit / 10000 * 100)
 
 
 if __name__ == "__main__":
     main()
+
+
+
