@@ -36,9 +36,34 @@ def evaluate_starting_hand(hole_cards):
 
 def evaluate_hand_strength(hole_cards, community_cards):
     '''General function to evaluate hand strength using rlcard's Hand class'''
+    
+    # Pad 5 or 6 cards to 7 with non-interfering dummy cards
     all_cards = hole_cards + community_cards
-    hand = Hand(all_cards)
+
+    # River (7 cards): evaluate directly with zero dummies
+    if len(all_cards) >= 7:
+        hand = Hand(all_cards[:7])
+        hand.evaluateHand()
+        return hand.category
+
+    # Flop (5 cards) or Turn (6 cards): pad up to 7
+    needed = 7 - len(all_cards)
+    used_ranks = {c[1] for c in all_cards}
+    suit_counts = {s: sum(1 for c in all_cards if c[0] == s) for s in 'SHDC'}
+    safe_suits = sorted(suit_counts, key=lambda suit: suit_counts[suit])
+
+    dummies = []
+    for r in ['2', '4', '6', '8', 'T', 'Q', 'A']:
+        if r not in used_ranks:
+            dummies.append(safe_suits[len(dummies) % 2] + r)
+            if len(dummies) == needed:
+                break
+
+    hand = Hand(all_cards + dummies)
+    print(f"number of cards in hand: {len(all_cards + dummies)}")
+    print(f"dummies added: {dummies}")
     hand.evaluateHand()
+
     return hand.category  # Returns an integer representing the hand strength
 
 
@@ -81,7 +106,7 @@ def calling_station_agent(state):
 
 
 
-def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.3):
+def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.25):
     """Raise frequently, regardless of hand strength."""
     legal_actions = state["raw_legal_actions"]
     hole_cards = state["raw_obs"]["hand"]
@@ -105,6 +130,8 @@ def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.
         if "check" in legal_actions:
             return "check"
 
+        return random.choice(legal_actions)
+
     elif len(all_cards) >= 5: # Postflop
         hand_strength = evaluate_hand_strength(hole_cards, community_cards)
 
@@ -122,6 +149,8 @@ def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.
                 return "check"
             if "fold" in legal_actions and random.random() < fold_prob:
                 return "fold"
+
+        return random.choice(legal_actions)
 
 
 def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
@@ -153,6 +182,10 @@ def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
             return "fold"
         if "check" in legal_actions:
             return "check"
+        if "call" in legal_actions:
+            return "call"
+
+        return random.choice(legal_actions)
 
     elif len(all_cards) >= 5:  # Postflop
         hand_strength = evaluate_hand_strength(hole_cards, community_cards)
@@ -175,4 +208,6 @@ def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
                 return "check"
             if "fold" in legal_actions and random.random() < fold_prob:
                 return "fold"
+
+        return random.choice(legal_actions)
 
