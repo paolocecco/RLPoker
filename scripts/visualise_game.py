@@ -4,15 +4,19 @@ import tkinter as tk
 from environments.rlcard_env import create_environment
 from agents.poker_agents import (
     improved_rule_based_agent,
-    improved_random_agent
+    improved_random_agent,
+    rule_based_agent,
+    calling_station_agent,
+    loose_aggressive_agent,
+    tight_aggressive_agent
 )
 
 
 env = create_environment()
 
 players = [
-    improved_rule_based_agent,
-    improved_random_agent
+    loose_aggressive_agent,
+    tight_aggressive_agent
 ]
 
 state, player_id = env.reset()
@@ -67,14 +71,14 @@ def draw_table():
 
     canvas.create_text(
         400, 65,
-        text="Player 2 - Random Agent",
+        text=f"Player 2 - {players[1].__name__}",
         fill="white",
         font=("Arial", 18)
     )
 
     canvas.create_text(
         400, 535,
-        text="Player 1 - Rule Agent",
+        text=f"Player 1 - {players[0].__name__}",
         fill="white",
         font=("Arial", 18)
     )

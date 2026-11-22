@@ -125,10 +125,10 @@ def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.
 
         if "raise" in legal_actions and random.random() < bluff_prob:
             return "raise"
-        if "fold" in legal_actions and random.random() < fold_prob:
-            return "fold"
         if "check" in legal_actions:
             return "check"
+        if "fold" in legal_actions and random.random() < fold_prob:
+            return "fold"
 
         return random.choice(legal_actions)
 
@@ -178,10 +178,10 @@ def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
             if "call" in legal_actions:
                 return "call"
 
-        if "fold" in legal_actions and random.random() < fold_prob:
-            return "fold"
         if "check" in legal_actions:
             return "check"
+        if "fold" in legal_actions and random.random() < fold_prob:
+            return "fold"
         if "call" in legal_actions:
             return "call"
 
