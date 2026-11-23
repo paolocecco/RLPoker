@@ -8,10 +8,13 @@ from agents.poker_agents import (
     improved_rule_based_agent,
     calling_station_agent,
     loose_aggressive_agent,
-    tight_aggressive_agent
+    tight_aggressive_agent,
+    loose_equity_agent,
+    tight_equity_agent
 )
 
 from environments.rlcard_env import create_environment
+from agents.equity_agent import EquityAgent
 
 ACTION_NAMES = {
     0: "Call",
@@ -95,12 +98,18 @@ def display_reduced_state(state, player_id, decision):
 def main():
 
 
-    player1 = tight_aggressive_agent
-    player2 = loose_aggressive_agent
+    player1 = loose_equity_agent
+    player2 = tight_equity_agent
     env = create_environment()
     player1profit = 0 
 
-    for episode in range(10):
+    for episode in range(1000):
+        if isinstance(player1, EquityAgent):
+            player1.reset()
+
+        if isinstance(player2, EquityAgent):
+            player2.reset()
+
         state, player_id = env.reset()
         state = env.get_state(player_id)
         decision = 1
