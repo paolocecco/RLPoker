@@ -93,6 +93,8 @@ def display_reduced_state(state, player_id, decision):
 
 
 def main():
+
+
     player1 = tight_aggressive_agent
     player2 = loose_aggressive_agent
     env = create_environment()

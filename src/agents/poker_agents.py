@@ -44,6 +44,7 @@ def evaluate_hand_strength(hole_cards, community_cards):
     if len(all_cards) >= 7:
         hand = Hand(all_cards[:7])
         hand.evaluateHand()
+        print(hand.category)
         return hand.category
 
     # Flop (5 cards) or Turn (6 cards): pad up to 7
@@ -121,7 +122,9 @@ def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.
                 return "raise"
             if "call" in legal_actions:
                 return "call"
-            return "check"
+            if "check" in legal_actions:
+                return "check"
+            
 
         if "raise" in legal_actions and random.random() < bluff_prob:
             return "raise"
@@ -135,14 +138,15 @@ def loose_aggressive_agent(state, raise_prob=0.75, fold_prob=0.25, bluff_prob=0.
     elif len(all_cards) >= 5: # Postflop
         hand_strength = evaluate_hand_strength(hole_cards, community_cards)
 
-        if hand_strength >= 1:  # One pair or better
+        if hand_strength >= 2:  # One pair or better
             if "raise" in legal_actions and random.random() < raise_prob:
                 return "raise"
             if "call" in legal_actions:
                 return "call"
-            return "check"
+            if "check" in legal_actions:
+                return "check"
 
-        if hand_strength == 0:  # High card
+        if hand_strength == 1:  # High card
             if "raise" in legal_actions and random.random() < bluff_prob:
                 return "raise"
             if "check" in legal_actions:
@@ -170,7 +174,8 @@ def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
                 return "raise"
             if "call" in legal_actions:
                 return "call"
-            return "check"
+            if "check" in legal_actions:
+                return "check"
 
         if playable:
             if "check" in legal_actions:
@@ -190,20 +195,21 @@ def tight_aggressive_agent(state, raise_prob=0.5, fold_prob=0.5):
     elif len(all_cards) >= 5:  # Postflop
         hand_strength = evaluate_hand_strength(hole_cards, community_cards)
 
-        if hand_strength >= 2:  # Two pair or better
+        if hand_strength >= 3:  # Two pair or better
             if "raise" in legal_actions and random.random() < raise_prob:
                 return "raise"
-            if "call" in legal_actions:
-                return "call"
-            return "check"
-
-        if hand_strength == 1:  # One pair
             if "call" in legal_actions:
                 return "call"
             if "check" in legal_actions:
                 return "check"
 
-        if hand_strength == 0:  # High card
+        if hand_strength == 2:  # One pair
+            if "call" in legal_actions:
+                return "call"
+            if "check" in legal_actions:
+                return "check"
+
+        if hand_strength == 1:  # High card
             if "check" in legal_actions:
                 return "check"
             if "fold" in legal_actions and random.random() < fold_prob:
