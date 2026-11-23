@@ -5,7 +5,10 @@ from agents.poker_agents import (
     random_agent,
     improved_random_agent,
     rule_based_agent,
-    improved_rule_based_agent
+    improved_rule_based_agent,
+    calling_station_agent,
+    loose_aggressive_agent,
+    tight_aggressive_agent
 )
 
 from environments.rlcard_env import create_environment
@@ -90,12 +93,12 @@ def display_reduced_state(state, player_id, decision):
 
 
 def main():
-    player1 = improved_rule_based_agent
-    player2 = improved_random_agent
+    player1 = tight_aggressive_agent
+    player2 = loose_aggressive_agent
     env = create_environment()
     player1profit = 0 
 
-    for episode in range(10000):
+    for episode in range(10):
         state, player_id = env.reset()
         state = env.get_state(player_id)
         decision = 1
