@@ -13,6 +13,7 @@ from agents.poker_agents import (
     tight_equity_agent
 )
 
+from environments.extended_rlcard_env import describe_obs
 from environments.rlcard_env import create_environment
 from agents.equity_agent import EquityAgent
 
@@ -76,7 +77,7 @@ def format_hand(cards):
         f"[{format_card(card)}]" for card in cards
     )
 
-def display_reduced_state(state, player_id, decision):
+def display_reduced_state(env, state, player_id, decision):
     raw = state["raw_obs"]
     legal_actions = list(state["legal_actions"].keys())
     print(" ")
@@ -87,6 +88,7 @@ def display_reduced_state(state, player_id, decision):
     print("Chips committed:", raw["all_chips"])
     print("Pot size:", sum(raw["all_chips"]))
     print("Raises per round:", raw["raise_nums"])
+    print("Extended obs:", describe_obs(env, state["obs"]))
 
     print("\n--- LEGAL ACTIONS ---")
     for action_id in legal_actions:
@@ -117,7 +119,7 @@ def main():
         while not env.is_over():
 
             legal_actions = display_reduced_state(
-                state, player_id, decision
+                env, state, player_id, decision
             )
 
             # Temporary random policy
